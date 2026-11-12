@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,42 +6,173 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HAMSTER LIFE</title>
 <style>
-body {
-  background: #171923;
-  color: white;
-  text-align: center;
-  font-family: Arial;
-  padding: 20px;
-}
-button {
-  padding: 18px;
-  border: 0;
-  border-radius: 15px;
-  font-size: 20px;
-  margin: 10px;
-  background: #f5c542;
-}
+*{box-sizing:border-box}
+body{margin:0;background:#101525;color:white;font-family:Arial,sans-serif;text-align:center}
+header{padding:22px;background:#19233b}
+h1{color:#ffd34e;margin:5px}
+.subtitle{color:#aab6d3}
+.balance{margin:22px auto;background:#202e49;padding:20px;border-radius:20px;width:90%;max-width:400px}
+.coins{font-size:34px;font-weight:bold;color:#ffd34e}
+.hamster{font-size:105px;margin:15px;cursor:pointer;user-select:none}
+.tap{background:#ffc83d;color:#171717;border:0;border-radius:18px;padding:16px 35px;font-size:18px;font-weight:bold}
+.tap:active{transform:scale(.95)}
+.energy{color:#8ee5a1;margin:15px}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;padding:12px}
+button{cursor:pointer}
+.tab,.action{background:#263653;color:white;border:1px solid #405477;border-radius:12px;padding:12px}
+.panel{display:none;margin:12px;padding:18px;background:#1c2942;border-radius:16px}
+.panel.active{display:block}
+.action{margin:7px;width:90%;max-width:300px}
+.small{color:#aab6d3;font-size:13px}
 </style>
 </head>
 <body>
-<h1>🐹 HAMSTER LIFE</h1>
-<h2 id="coins">0 Coins</h2>
-<h3 id="energy">Energy: 1000</h3>
-<button onclick="tap()">🐹 TAP TO EARN</button>
-<script>
-let balance = 0;
-let energy = 1000;
 
-function tap() {
-  if (energy > 0) {
-    balance++;
-    energy--;
-    document.getElementById("coins").innerText =
-      balance + " Coins";
-    document.getElementById("energy").innerText =
-      "Energy: " + energy;
-  }
+<header>
+<h1>🐹 HAMSTER LIFE</h1>
+<div class="subtitle">Tap • Earn • Upgrade</div>
+</header>
+
+<div class="balance">
+<div>Your Balance</div>
+<div class="coins" id="coins">0</div>
+<div class="small">HAMSTER COINS</div>
+<div class="energy">⚡ Energy: <span id="energy">1000</span>/1000</div>
+</div>
+
+<div class="hamster" onclick="tap()">🐹</div>
+<button class="tap" onclick="tap()">TAP TO EARN</button>
+
+<div class="tabs">
+<button class="tab" onclick="show('home')">Home</button>
+<button class="tab" onclick="show('upgrade')">Upgrade</button>
+<button class="tab" onclick="show('bonus')">Bonus</button>
+<button class="tab" onclick="show('friends')">Friends</button>
+<button class="tab" onclick="show('exchange')">Exchange</button>
+<button class="tab" onclick="show('support')">Support</button>
+</div>
+
+<div id="home" class="panel active">
+<h2>Welcome to HAMSTER LIFE</h2>
+<p>Tap the hamster and collect coins!</p>
+</div>
+
+<div id="upgrade" class="panel">
+<h2>🚀 Upgrades</h2>
+<p>Tap power: <span id="power">1</span> coin per tap</p>
+<button class="action" onclick="upgrade()">Upgrade Tap Power — <span id="cost">100</span> coins</button>
+</div>
+
+<div id="bonus" class="panel">
+<h2>🎁 Daily Bonus</h2>
+<p>Claim your daily reward!</p>
+<button class="action" onclick="daily()">Claim 500 Coins</button>
+<p id="bonusmsg"></p>
+</div>
+
+<div id="friends" class="panel">
+<h2>👥 Invite Friends</h2>
+<p>Invite friends to HAMSTER LIFE.</p>
+<button class="action" onclick="invite()">Invite Friends</button>
+<p class="small">Referral rewards will be connected to the Telegram bot later.</p>
+</div>
+
+<div id="exchange" class="panel">
+<h2>💎 Exchange</h2>
+<p>50,000 Coins = 1,000 Diamonds</p>
+<p>1,000 Diamonds = $2</p>
+<button class="action" onclick="exchange()">Exchange 50,000 Coins</button>
+<p id="exmsg"></p>
+<p>Your Diamonds: <span id="diamonds">0</span></p>
+</div>
+
+<div id="support" class="panel">
+<h2>🛟 Support</h2>
+<button class="action" onclick="contact()">Contact Admin</button>
+<button class="action" onclick="report()">Report a Problem</button>
+<p id="supportmsg"></p>
+</div>
+
+<script>
+let coins=Number(localStorage.getItem("hl_coins"))||0;
+let energy=Number(localStorage.getItem("hl_energy"));
+if(!localStorage.getItem("hl_energy"))energy=1000;
+let power=Number(localStorage.getItem("hl_power"))||1;
+let cost=Number(localStorage.getItem("hl_cost"))||100;
+let diamonds=Number(localStorage.getItem("hl_diamonds"))||0;
+
+function save(){
+localStorage.setItem("hl_coins",coins);
+localStorage.setItem("hl_energy",energy);
+localStorage.setItem("hl_power",power);
+localStorage.setItem("hl_cost",cost);
+localStorage.setItem("hl_diamonds",diamonds);
+update();
 }
+function update(){
+document.getElementById("coins").textContent=coins.toLocaleString();
+document.getElementById("energy").textContent=energy;
+document.getElementById("power").textContent=power;
+document.getElementById("cost").textContent=cost;
+document.getElementById("diamonds").textContent=diamonds;
+}
+function tap(){
+if(energy<power){alert("Not enough energy!");return;}
+coins+=power;
+energy-=power;
+save();
+}
+function upgrade(){
+if(coins<cost){alert("Not enough coins!");return;}
+coins-=cost;
+power++;
+cost=Math.floor(cost*1.8);
+save();
+}
+function daily(){
+let today=new Date().toDateString();
+if(localStorage.getItem("hl_daily")===today){
+document.getElementById("bonusmsg").textContent="You already claimed today's bonus!";
+return;
+}
+coins+=500;
+localStorage.setItem("hl_daily",today);
+save();
+document.getElementById("bonusmsg").textContent="500 coins received!";
+}
+function exchange(){
+if(coins<50000){
+document.getElementById("exmsg").textContent="You need 50,000 coins.";
+return;
+}
+coins-=50000;
+diamonds+=1000;
+save();
+document.getElementById("exmsg").textContent="1,000 diamonds added!";
+}
+function invite(){
+let link=location.href;
+if(navigator.share){
+navigator.share({title:"HAMSTER LIFE",text:"Join my HAMSTER LIFE game!",url:link});
+}else{
+navigator.clipboard.writeText(link);
+alert("Game link copied!");
+}
+}
+function contact(){
+document.getElementById("supportmsg").textContent="Admin contact will be connected soon.";
+}
+function report(){
+document.getElementById("supportmsg").textContent="Problem reporting will be connected soon.";
+}
+function show(id){
+document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+document.getElementById(id).classList.add("active");
+}
+setInterval(()=>{
+if(energy<1000){energy=Math.min(1000,energy+1);save();}
+},3000);
+update();
 </script>
 </body>
 </html>
