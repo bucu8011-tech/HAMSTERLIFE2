@@ -1,11 +1,46 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>HAMSTER LIFE</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HAMSTER LIFE</title>
+<style>
+body {
+  background: #171923;
+  color: white;
+  text-align: center;
+  font-family: Arial;
+  padding: 20px;
+}
+button {
+  padding: 18px;
+  border: 0;
+  border-radius: 15px;
+  font-size: 20px;
+  margin: 10px;
+  background: #f5c542;
+}
+</style>
 </head>
 <body>
-  <h1>🐹 HAMSTER LIFE</h1>
-  <h2>0 Coins</h2>
-  <button>🐹 TAP TO EARN</button>
+<h1>🐹 HAMSTER LIFE</h1>
+<h2 id="coins">0 Coins</h2>
+<h3 id="energy">Energy: 1000</h3>
+<button onclick="tap()">🐹 TAP TO EARN</button>
+<script>
+let balance = 0;
+let energy = 1000;
+
+function tap() {
+  if (energy > 0) {
+    balance++;
+    energy--;
+    document.getElementById("coins").innerText =
+      balance + " Coins";
+    document.getElementById("energy").innerText =
+      "Energy: " + energy;
+  }
+}
+</script>
 </body>
 </html>
